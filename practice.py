@@ -4,3 +4,5 @@ c = "4"
 print(str(a+b)+c)
 
 print ("hello")
+print (a+b)
+print ("Thank U")
