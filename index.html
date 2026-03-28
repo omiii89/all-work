@@ -1,0 +1,663 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chocolate Bowl | Premium Artisan Chocolates</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        chocolate: {
+                            900: '#2B1B18', // Dark Brown
+                            800: '#4A2C24', // Medium Brown
+                            600: '#795548', // Milk Chocolate
+                            100: '#D7CCC8', // Light Cream
+                        },
+                        gold: {
+                            400: '#FFD54F',
+                            500: '#FFC107',
+                            600: '#FFB300',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Lato"', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Overrides */
+        body {
+            background-color: #FFF8E1;
+            color: #2B1B18;
+            overflow-x: hidden;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbar for clean look but keep functionality */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFF8E1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #795548;
+            border-radius: 4px;
+        }
+
+        /* Navigation Link Active State */
+        .nav-link.active {
+            color: #FFC107;
+            border-bottom: 2px solid #FFC107;
+        }
+
+        /* Card Hover Effects */
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(43, 27, 24, 0.15);
+        }
+
+        /* Hero Image Overlay */
+        .hero-overlay {
+            background: linear-gradient(to right, rgba(43, 27, 24, 0.9), rgba(43, 27, 24, 0.4));
+        }
+
+        /* Cart Sidebar Animation */
+        #cart-sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #cart-sidebar.closed {
+            transform: translateX(100%);
+        }
+        #cart-sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #2B1B18;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+            border-left: 5px solid #FFC107;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        .user{
+            background-color: rgb(190, 162, 162);
+            height: 10vh;
+            width: 20xp;
+            border-radius: 0.5em;
+        }
+        .user b {
+            font-size: 30px;
+            font-family: serif;
+            
+            margin-left: 1pc;
+            align-items: center;
+            justify-content: center;
+        }
+        .user span {
+            font-size: 20px;
+            font-family: serif;
+            padding-top: 40pc;
+            margin-bottom: 3pc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <header class="fixed w-full top-0 z-50 bg-chocolate-900 text-chocolate-100 shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" onclick="navigateTo('home')" class="text-2xl font-serif font-bold text-gold-400 tracking-widest">
+                CHOCOLATE <span class="text-white">BOWL</span>
+            </a>
+
+            <!-- Desktop Menu -->
+            <nav class="hidden md:flex space-x-8">
+                <button onclick="navigateTo('home')" class="nav-link hover:text-gold-400 transition-colors py-1" data-target="home">Home</button>
+                <button onclick="navigateTo('products')" class="nav-link hover:text-gold-400 transition-colors py-1" data-target="products">Products</button>
+                <button onclick="navigateTo('about')" class="nav-link hover:text-gold-400 transition-colors py-1" data-target="about">About</button>
+                <button onclick="navigateTo('contact')" class="nav-link hover:text-gold-400 transition-colors py-1" data-target="contact">Contact</button>
+            </nav>
+
+            <!-- Cart Icon & Mobile Menu Toggle -->
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleCart()" class="relative p-2 hover:text-gold-400 transition-transform hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="cart-count" class="absolute top-0 right-0 bg-gold-400 text-chocolate-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform scale-0 transition-transform duration-300">0</span>
+                </button>
+                
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-gold-400 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-chocolate-800 px-2 pt-2 pb-3 space-y-1 shadow-md">
+            <button onclick="navigateTo('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-chocolate-100 hover:bg-chocolate-600 hover:text-white">Home</button>
+            <button onclick="navigateTo('products'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-chocolate-100 hover:bg-chocolate-600 hover:text-white">Products</button>
+            <button onclick="navigateTo('about'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-chocolate-100 hover:bg-chocolate-600 hover:text-white">About</button>
+            <button onclick="navigateTo('contact'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-chocolate-100 hover:bg-chocolate-600 hover:text-white">Contact</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow pt-20">
+        
+        <!-- ==================== HOME PAGE ==================== -->
+        <section id="home" class="page-section animate-fade-in">
+            <!-- Hero Section -->
+            <div class="relative h-[80vh] w-full flex items-center">
+                <!-- Background Image -->
+                <div class="absolute inset-0 z-0">
+                    <img src="https://images.unsplash.com/photo-1549007994-cb92caebd54b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80" alt="Chocolate Bowl" class="w-full h-full object-cover">
+                </div>
+                <!-- Overlay -->
+                <div class="absolute inset-0 hero-overlay z-10"></div>
+                
+                <!-- Hero Content -->
+                <div class="container mx-auto px-6 relative z-20">
+                    <div class="max-w-2xl text-chocolate-100 animate-slide-up">
+                        <span class="text-gold-400 font-bold tracking-widest uppercase text-sm mb-2 block">Artisan & Handcrafted</span>
+                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight">Indulge in Pure <br><span class="text-gold-400 italic">Decadence</span></h1>
+                        <p class="text-lg md:text-xl mb-8 text-chocolate-100 font-light">Experience the finest selection of hand-poured chocolates and desserts, crafted daily using only the finest Belgian cocoa and premium ingredients.</p>
+                        <button onclick="navigateTo('products')" class="bg-gold-400 hover:bg-gold-500 text-chocolate-900 font-bold py-3 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">
+                            Shop Collection
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Products Preview -->
+            <div class="container mx-auto px-6 py-20">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-serif font-bold text-chocolate-900 mb-4">Best Sellers</h2>
+                    <div class="w-24 h-1 bg-gold-400 mx-auto"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="featured-container">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Special Offers Banner -->
+            <div class="bg-chocolate-800 py-16">
+                <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between">
+                    <div class="mb-8 md:mb-0 text-center md:text-left">
+                        <h2 class="text-3xl md:text-4xl font-serif font-bold text-white mb-2">The Premium Box</h2>
+                        <p class="text-chocolate-100">A curated selection of 12 exclusive truffles and treats.</p>
+                    </div>
+                    <button onclick="navigateTo('products')" class="bg-transparent border-2 border-gold-400 text-gold-400 hover:bg-gold-400 hover:text-chocolate-900 font-bold py-2 px-6 rounded-full transition-all">
+                        View Box Details
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PRODUCTS PAGE ==================== -->
+        <section id="products" class="page-section hidden py-10">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-10">
+                    <h2 class="text-4xl font-serif font-bold text-chocolate-900 mb-6">Our Menu</h2>
+                    
+                    <!-- Filter Buttons -->
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2 rounded-full border-2 border-chocolate-900 text-chocolate-900 hover:bg-chocolate-900 hover:text-gold-400 transition-all font-bold" data-category="all">All</button>
+                        <button onclick="filterProducts('chocolates')" class="filter-btn px-6 py-2 rounded-full border-2 border-chocolate-900 text-chocolate-900 hover:bg-chocolate-900 hover:text-gold-400 transition-all font-bold" data-category="chocolates">Chocolates</button>
+                        <button onclick="filterProducts('desserts')" class="filter-btn px-6 py-2 rounded-full border-2 border-chocolate-900 text-chocolate-900 hover:bg-chocolate-900 hover:text-gold-400 transition-all font-bold" data-category="desserts">Desserts</button>
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="products-container">
+                    <!-- Products injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ABOUT PAGE ==================== -->
+        <section id="about" class="page-section hidden py-16 bg-chocolate-100">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="w-full md:w-1/2">
+                        <img src="https://images.unsplash.com/photo-1624353365286-3f8d62daad51?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Chef making chocolate" class="rounded-lg shadow-2xl">
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <span class="text-brown-400 font-bold tracking-widest uppercase text-sm">Our Story</span>
+                        <h2 class="text-4xl font-serif font-bold text-chocolate-900 mt-2 mb-6">Crafted with Passion</h2>
+                        <p class="text-chocolate-600 mb-4 leading-relaxed">
+                            Chocolate Bowl began in a small kitchen with a simple mission: to bring the purest taste of cocoa to your doorstep. We believe that chocolate is more than just a sweet treat—it's an experience.
+                        </p>
+                        <p class="text-chocolate-600 mb-6 leading-relaxed">
+                            Every piece is hand-crafted using traditional tempering techniques and organic ingredients sourced directly from sustainable farms in Ghana and Ecuador. From the smooth velvet texture of our dark truffles to the crisp hazelnut crunch in our pralines, every bite tells a story of craftsmanship.
+                        </p>
+                        <div class="flex gap-8">
+                            <div>
+                                <span class="block text-3xl font-bold text-chocolate-900 font-serif">100%</span>
+                                <span class="text-sm text-chocolate-500 uppercase tracking-wide">Organic</span>
+                            </div>
+                            <div>
+                                <span class="block text-3xl font-bold text-chocolate-900 font-serif">15k+</span>
+                                <span class="text-sm text-chocolate-500 uppercase tracking-wide">Happy Customers</span>
+                            </div>
+                            <div class="user">
+                                <b>12M+</b><br>
+                                <span>Active User</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CONTACT PAGE ==================== -->
+        <section id="contact" class="page-section hidden py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-serif font-bold text-chocolate-900 mb-4">Get in Touch</h2>
+                    <p class="text-chocolate-600">Have a question or order a custom gift box? Reach out to us.</p>
+                </div>
+
+                <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-xl border border-chocolate-100">
+                    <form onsubmit="handleContactSubmit(event)">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-chocolate-900 font-bold mb-2">Name</label>
+                                <input type="text" required class="w-full px-4 py-3 rounded border border-chocolate-300 focus:outline-none focus:border-gold-400 bg-chocolate-50 transition-colors" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-chocolate-900 font-bold mb-2">Email</label>
+                                <input type="email" required class="w-full px-4 py-3 rounded border border-chocolate-300 focus:outline-none focus:border-gold-400 bg-chocolate-50 transition-colors" placeholder="john@example.com">
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-chocolate-900 font-bold mb-2">Message</label>
+                            <textarea rows="4" required class="w-full px-4 py-3 rounded border border-chocolate-300 focus:outline-none focus:border-gold-400 bg-chocolate-50 transition-colors" placeholder="Tell us about your order..."></textarea>
+                        </div>
+                        <a href="mailto:mohiteom71@gmail.com?subject=Website Contact&body=Hello, I want to connect with you">
+                        <button type="submit" class="w-full bg-chocolate-900 hover:bg-chocolate-800 text-white font-bold py-3 rounded transition-colors shadow-lg">
+                            Send Message
+                        </button>
+                        </a>
+                    </form>
+                </div>
+
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-chocolate-100 p-3 rounded-full text-chocolate-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-chocolate-900 text-lg">Visit Us</h3>
+                            <p class="text-chocolate-600">123 Cocoa Lane, Sweet City, SC 29401</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-chocolate-100 p-3 rounded-full text-chocolate-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-chocolate-900 text-lg">Call Us</h3>
+                            <p class="text-chocolate-600">+91 8865488525</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-chocolate-900 text-chocolate-100 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div class="col-span-1 md:col-span-1">
+                    <h3 class="text-2xl font-serif font-bold text-gold-400 mb-4">CHOCOLATE <span class="text-white">BOWL</span></h3>
+                    <p class="text-sm text-chocolate-100 opacity-80 mb-4">Bringing happiness one bite at a time. Pure, organic, and delicious.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4 uppercase tracking-wider">Quick Links</h4>
+                    <ul class="space-y-2 text-sm opacity-80">
+                        <li><a href="#" onclick="navigateTo('home')" class="hover:text-gold-400 transition-colors">Home </a></li>
+                        <li><a href="#" onclick="navigateTo('products')" class="hover:text-gold-400 transition-colors">Products</a></li>
+                        <li><a href="#" onclick="navigateTo('about')" class="hover:text-gold-400 transition-colors">About Us</a></li>
+                        <li><a href="#" onclick="navigateTo('contact')" class="hover:text-gold-400 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4 uppercase tracking-wider">Opening Hours</h4>
+                    <ul class="space-y-2 text-sm opacity-80">
+                        <li>Mon - Fri: 9am - 8pm</li>
+                        <li>Saturday: 10am - 6pm</li>
+                        <li>Sunday: 12pm - 5pm</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4 uppercase tracking-wider">Newsletter</h4>
+                    <div class="flex">
+                        <input type="email" placeholder="Your email" class="bg-chocolate-800 px-4 py-2 rounded-l w-full text-white focus:outline-none border border-chocolate-700">
+                        <button class="bg-gold-400 px-4 py-2 rounded-r hover:bg-gold-500 transition-colors">→</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-chocolate-800 pt-8 text-center text-sm opacity-60">
+                &copy; 2023 Chocolate Bowl. All rights reserved.
+                <a href="C:\Users\om\OneDrive\Documents\chocolate bowl\chocolate_bowl_copyright_statement.pdf">Copy Right</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Sidebar (Off-canvas) -->
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden transition-opacity opacity-0"></div>
+    <aside id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-chocolate-100 z-[70] shadow-2xl closed flex flex-col">
+        <div class="p-6 border-b border-chocolate-300 flex justify-between items-center bg-chocolate-900 text-chocolate-100">
+            <h2 class="text-xl font-serif font-bold">Your Cart</h2>
+            <button onclick="toggleCart()" class="text-gold-400 hover:text-white text-2xl">&times;</button>
+        </div>
+        
+        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4">
+            <!-- Cart items injected here -->
+            <div id="empty-cart-msg" class="text-center text-chocolate-600 mt-10">
+                <p>Your cart is empty.</p>
+                <p class="text-sm">Let's add some sweetness!</p>
+            </div>
+        </div>
+
+        <div class="p-6 bg-white border-t border-chocolate-300">
+            <div class="flex justify-between mb-4 text-lg font-bold text-chocolate-900">
+                <span>Total:</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+            <button onclick="checkout()" class="w-full bg-gold-400 hover:bg-gold-500 text-chocolate-900 font-bold py-3 rounded transition-colors">
+                Checkout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Toast Notification -->
+    <div id="toast">Item added to cart!</div>
+
+    <!-- JavaScript Functionality -->
+    <script>
+        // --- Data ---
+        const products = [
+            { id: 1, name: "Midnight Truffle", price: 12.00, category: "chocolates", image: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" },
+            { id: 2, name: "Velvet Hazelnut", price: 10.50, category: "chocolates", image: "https://i.pinimg.com/1200x/06/cb/77/06cb77e13df0187b0053047d3af957a8.jpg"},
+            { id: 3, name: "Raspberry Ganache", price: 11.00, category: "chocolates", image: "https://i.pinimg.com/736x/38/bf/ad/38bfad0df32760e5863631eb7b2eeebe.jpg" },
+            { id: 4, name: "Golden Nugget", price: 14.00, category: "chocolates", image: "https://i.pinimg.com/1200x/41/9b/c4/419bc4af937a7e0e029246f2069c2af4.jpg"},
+            { id: 5, name: "Caramel Croissant", price: 9.50, category: "desserts", image: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" },
+            { id: 6, name: "Chocolate Tart", price: 13.50, category: "desserts", image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" },
+            { id: 7, name: "Lava Cake", price: 8.00, category: "desserts", image: "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" },
+            { id: 8, name: "Strawberry Cheesecake", price: 15.00, category: "desserts", image: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" }
+        ];
+
+        let cart = [];
+
+        // --- Navigation Logic (SPA Feel) ---
+        function navigateTo(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show target section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+            
+            // Update active nav link styling
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if(link.getAttribute('data-target') === sectionId) {
+                    link.classList.add('active');
+                }
+            });
+
+            // If navigating to products, render them
+            if(sectionId === 'products') {
+                renderProducts('all');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- Product Rendering ---
+        function createProductCard(product) {
+            return `
+                <div class="product-card bg-white rounded-xl shadow-md overflow-hidden group flex flex-col h-full animate-fade-in">
+                    <div class="relative overflow-hidden h-64">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <button onclick="addToCart(${product.id})" class="absolute bottom-4 right-4 bg-white text-chocolate-900 p-3 rounded-full shadow-lg hover:bg-gold-400 hover:text-white transition-all transform hover:scale-110 focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="text-xs text-gold-500 uppercase font-bold tracking-wide mb-2">${product.category}</div>
+                        <h3 class="text-xl font-bold text-chocolate-900 mb-2 font-serif">${product.name}</h3>
+                        <div class="mt-auto flex justify-between items-center">
+                            <span class="text-2xl font-bold text-chocolate-800">$${product.price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProducts(category) {
+            const container = document.getElementById('products-container');
+            const filtered = category === 'all' 
+                ? products 
+                : products.filter(p => p.category === category);
+            
+            container.innerHTML = filtered.map(createProductCard).join('');
+        }
+
+        // Filter functionality updates UI for "All" vs Categories
+        function filterProducts(category) {
+            // Visual update for buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.dataset.category === category) {
+                    btn.classList.add('bg-chocolate-900', 'text-white', 'border-chocolate-900');
+                    btn.classList.remove('text-chocolate-900', 'border-chocolate-900');
+                } else {
+                    btn.classList.remove('bg-chocolate-900', 'text-white', 'border-chocolate-900');
+                    btn.classList.add('text-chocolate-900', 'border-chocolate-900');
+                }
+            });
+            renderProducts(category);
+        }
+
+        // Initialize Products on Home (featured) and Products Page
+        function initProducts() {
+            // Show first 3 products on Home
+            const featuredContainer = document.getElementById('featured-container');
+            featuredContainer.innerHTML = products.slice(0, 3).map(createProductCard).join('');
+            
+            // Show All on Products page (initially)
+            renderProducts('all');
+        }
+
+        // --- Cart Logic ---
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCartUI();
+            showToast(`Added ${product.name} to cart`);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            // Update Count
+            const countBadge = document.getElementById('cart-count');
+            countBadge.textContent = cart.length;
+            
+            // Animate badge
+            if (cart.length > 0) {
+                countBadge.classList.remove('scale-0');
+                countBadge.classList.add('scale-100');
+            } else {
+                countBadge.classList.remove('scale-100');
+                countBadge.classList.add('scale-0');
+            }
+
+            // Update Sidebar
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotalEl = document.getElementById('cart-total');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div id="empty-cart-msg" class="text-center text-chocolate-600 mt-10">
+                        <p>Your cart is empty.</p>
+                        <p class="text-sm">Let's add some sweetness!</p>
+                    </div>
+                `;
+                cartTotalEl.textContent = "$0.00";
+            } else {
+                let total = 0;
+                cartItemsContainer.innerHTML = cart.map((item, index) => {
+                    total += item.price;
+                    return `
+                        <div class="flex items-center space-x-4 bg-white p-3 rounded shadow-sm border border-chocolate-200">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md">
+                            <div class="flex-grow">
+                                <h4 class="font-bold text-chocolate-900 text-sm">${item.name}</h4>
+                                <p class="text-gold-600 font-bold">$${item.price.toFixed(2)}</p>
+                            </div>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                cartTotalEl.textContent = "$" + total.toFixed(2);
+            }
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('cart-overlay');
+            
+            if (sidebar.classList.contains('closed')) {
+                sidebar.classList.remove('closed');
+                sidebar.classList.add('open');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10); // Fade in overlay
+            } else {
+                sidebar.classList.remove('open');
+                sidebar.classList.add('closed');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300); // Wait for transition
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                showToast("Your cart is empty!");
+                return;
+            }
+            // Simple checkout simulation
+            const confirmOrder = confirm(`Thank you for your order!\n\nTotal: ${document.getElementById('cart-total').textContent}\n\nClick OK to complete the transaction.`);
+            if (confirmOrder) {
+                cart = [];
+                updateCartUI();
+                toggleCart();
+                showToast("Order placed successfully!");
+            }
+        }
+
+        // --- Utilities ---
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function handleContactSubmit(e) {
+            e.preventDefault();
+            showToast("Message sent! We'll be in touch soon.");
+            e.target.reset();
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initProducts();
+        });
+
+    </script>
+</body>
+</html>
